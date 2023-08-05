@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+		<link rel="stylesheet" href="js/jquery.mobile-1.4.5.css">
+   		<script src="js/jquery.js"></script>
+        <script src="js/jquery.mobile-1.4.5.js"></script>
+        <script type="text/javascript" src="cordova.js"></script>
+
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+		<title>Blank App</title>
+
+
+        <script type="text/javascript">
+
+            var localIP = "localhost";
+
+            $.mobile.pageLoadErrorMessage = "";
+
+            listShoes();
+
+            function listShoes() {
+                var url = "http://" + localIP + "/onlineretail/index.php?operation=3";
+
+                $.get(url, function(data,status) {
+                    $("#output").html(data).listview('refresh');
+                    $("#output6").html(data).listview('refresh');
+
+                });
+            }
+
+
+            var retail_name;
+            var retail_id;
+
+            //Reatil Login and Admin Login
+            function login() {
+
+                var user_c = $("[name='username']").val();
+                var pass_c = $("[name='password']").val();
+
+                if (user_c == "" || pass_c == "") {
+                    alert("A username and a password must be entered !");
+                }
+                else {
+
+                    var url = "http://"+localIP+"/onlineretail/index.php?operation=4&username="+user_c+"&password="+pass_c;
+
+                    $.get(url, function(data,status) {
+                        const arr = data.split("||");
+                    
+                    if (arr[0] != "") {
+                            if (arr[0] == 'Admin') {
+                                alert('Admin Account found !');
+                                $.mobile.changePage("#pageseven", {reverse:false, transition:"slide"});
+                                loadRetails();
+                                loadRetails3();
+                            }
+                            else {
+                                retail_name = arr[0];
+                                retail_id = arr[1];
+                                listSales();
+
+                                $("#header h1").html(arr[0] + ' Retail');
+                                $.mobile.changePage("#pagetwo", {reverse:false, transition:"slide"});
+                            }
+                        
+                    }
+                    else {
+                        alert("Account does not exist !")
+                    }
+                    });
+                }
+            }
+
+            var latitude, longitude;
+
+            //getting uset longitude and latitude
+            function userLocated(position) {
+                latitude = position.coords.latitude;
+                longitude = position.coords.longitude;
+                //alert("Lat: " + latitude + ", Long: " + longitude);
+            }
+
+
+            //catching errors in geoloacation
+            function locationError(error){
+			
+			switch(error.code) {
+				case error.PERMISSION_DENIED:
+					alert("Permission Denied- " + error.message);
+					break;
+				case error.POSITION_UNAVAILABLE:
+					alert("Position Not Availabale- " + error.message);
+					break;
+				case error.TIMEOUT:
+					alert("Request Time out- " + error.message);
+					break;
+			}
+		    }
+
+
+            function displayLocationMap() {
+                var retail3 = $("[name='retails5']").val();
+
+                document.getElementById('map').style.display = 'none';
+
+                var map = null;
+
+                if (retail3 == "") {
+                    document.getElementById('map').style.display = 'none';
+                }
+                else {
+                    document.getElementById('map').style.display = 'block';
+                    var url = "http://"+localIP+"/onlineretail/admin.php?operation=10&retail_id="+retail3;
+
+                    $.get(url, function(data,status) {
+                        const arr = data.split("||");
+
+                        var lat = arr[0];
+                        var long = arr[1];
+
+                        map = L.map('map').setView([lat, long], 16);
+
+                        L.tileLayer('https://api.maptiler.com/maps/openstreetmap/{z}/{x}/{y}.jpg?key=RUTN1Mr5nLDd4DEalDAP', {
+                            maxZoom: 19,
+                            attribution: '<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>',
+                            tileSize: 512,
+                            zoomOffset: -1,
+                        }).addTo(map);
+
+                        var optionText = document.getElementById("retailSelect5").options[document.getElementById("retailSelect5").selectedIndex].textContent + " Shoe Retail Shop";
+                        
+                        var marker = L.marker([lat, long]).addTo(map);
+
+                        marker.bindPopup(optionText).openPopup();
+
+                        //$("#map").html(arr[1]).enhanceWithin().enhanceWithin('refresh');
+                    }); 
+                }
+                
+            }
+        
+
+
+            function registration() {
+                $.mobile.changePage("#pagefour", {reverse:false, transition:"slide"});
+
+                if(navigator.geolocation == undefined){
+                    alert("Geolocation undefined");
+                }else{
+                    navigator.geolocation.getCurrentPosition(userLocated, locationError); 
+                }
+            }
+
+            function registrationProcess() {
+                //alert("Retail registration Called");
+
+                var user_c = $("[name='username2']").val();
+                var pass_c = $("[name='password2']").val();
+                var loc_c = $("[name='location']").val();
+
+                
+
+                var url = "http://"+localIP+"/onlineretail/index.php?operation=2&username="+user_c+"&password="+pass_c+"&location="+loc_c+"&latitude="+latitude+"&longitude="+longitude;
+
+                    $.get(url, function(data,status) {
+                        alert(data);
+                    });
+            }
+
+            var product_id;
+
+            //Product Click
+            function productClicked(id) {
+                    product_id = id;
+                    getShoe(id);
+                    $.mobile.changePage("#pagesix", {reverse:false, transition:"slide"});
+            }
+
+            function productClickedAdmin(id) {
+                    product_id = id;
+                    getShoeAdmin(id);
+                    $.mobile.changePage("#pageten", {reverse:false, transition:"slide"});
+            }
+
+
+            //Get Single Shoe
+            function getShoe(shoeId) {
+                var url = "http://"+localIP+"/onlineretail/index.php?operation=1&product_id="+shoeId;
+
+                    $.get(url, function(data,status) {
+                        const arr = data.split("||");
+                        $("#shoeTop").html(arr[0]);
+                        
+                        $("#shoeDetails").html(arr[1]).listview('refresh');
+                        $("#salesInsert").html(arr[2]).enhanceWithin().enhanceWithin("refresh");
+                    });
+            }
+
+            function getShoeAdmin(shoeId) {
+                var url = "http://"+localIP+"/onlineretail/admin.php?operation=8&product_id="+shoeId;
+
+                    $.get(url, function(data,status) {
+                        const arr = data.split("||");
+                        $("#shoeTop5").html(arr[0]);
+                        
+                        $("#shoeDetails5").html(arr[1]).listview('refresh');
+                        $("#salesInsert5").html(arr[2]).enhanceWithin().enhanceWithin("refresh");
+                    });
+            }
+
+
+            function listSales() {
+                var url = "http://"+localIP+"/onlineretail/index.php?operation=6&retail_id="+retail_id;
+
+                //alert(retail_id);
+
+                $.get(url, function(data,status) {
+                    $("#output2").html(data).listview('refresh');
+                });
+            }
+
+            
+
+            function listAdminSales() {
+                var retail2 = $("[name='retails']").val();
+                var url = "http://"+localIP+"/onlineretail/admin.php?operation=1&retail_id="+retail2;
+
+                $.get(url, function(data,status) {
+                    const arr = data.split("||");
+                    $("#output3").html(arr[0]).listview('refresh');
+                    $("#datePicker").html(arr[1]).enhanceWithin().enhanceWithin('refresh');
+                });
+            }
+
+
+            function loadProductsForAdmin() {
+                var url = "http://"+localIP+"/onlineretail/admin.php?operation=7";
+
+                $.get(url, function(data,status) {
+                    $("#output6").html(data).listview('refresh');
+
+                });
+            }
+
+            function loadRetails() {
+                var url = "http://"+localIP+"/onlineretail/admin.php?operation=2";
+
+                $.get(url, function(data,status) {
+                    $("#retailSelect").html(data).enhanceWithin().enhanceWithin('refresh');
+                });
+            }
+
+            function loadRetails2() {
+                var url = "http://"+localIP+"/onlineretail/admin.php?operation=2";
+
+                $.get(url, function(data,status) {
+                    $("#retailSelect2").html(data).enhanceWithin().enhanceWithin('refresh');
+                });
+
+                loadProductsForAdmin();
+            }
+
+            function loadRetails3() {
+                var url = "http://"+localIP+"/onlineretail/admin.php?operation=2";
+
+                $.get(url, function(data,status) {
+                    $("#retailSelect5").html(data).enhanceWithin().enhanceWithin('refresh');
+                });
+            }
+
+            
+            
+
+
+
+            function updateRecord(s_id) {
+                var url = "http://"+localIP+"/onlineretail/admin.php?operation=3&sales_id="+s_id;
+
+                $.get(url, function(data,status) {
+                        const arr = data.split("||");
+                        
+                        $("#shoeTop2").html(arr[0]);
+                        $("#inputs").html(arr[1]).enhanceWithin().enhanceWithin("refresh");
+                        $("#updateConfirm").html(arr[2]).enhanceWithin().enhanceWithin("refresh");
+                        $('#usaleheader').html(arr[3]).enhanceWithin().enhanceWithin("refresh");;
+                        $.mobile.changePage("#pagenine", {reverse:false, transition:"slide"});
+                });
+            }
+
+
+            function confirmUpdate(s_id) {
+                var qty_c = $("[name='qty3']").val();
+
+                var url = "http://"+localIP+"/onlineretail/admin.php?operation=4&sales_id="+s_id+"&qty="+qty_c;
+
+                $.get(url, function(data,status) {
+                    alert(data);
+                    listAdminSales();
+                    $.mobile.changePage("#pageseven", {reverse:false, transition:"slide"});
+                });
+            }
+
+            function deleteRecord(s_id) {
+                var url = "http://"+localIP+"/onlineretail/admin.php?operation=5&sales_id="+s_id;
+
+                $.get(url, function(data,status) {
+                    alert(data);
+                    listAdminSales();
+                    $.mobile.changePage("#pageseven", {reverse:false, transition:"slide"});
+                });
+            }
+
+
+            function insertSale() {
+                var qty_c = $("[name='qty']").val();
+                var url = "http://"+localIP+"/onlineretail/index.php?operation=5&quantity="+qty_c+"&retail_id="+retail_id+"&product_id="+product_id;
+
+                $.get(url, function(data,status) {
+                        alert(data);
+                        $.mobile.changePage("#pagethree", {reverse:false, transition:"slide"});
+                });
+
+                listSales();
+            }
+
+            function insertSaleAdmin() {
+                var qty_c = $("[name='qty5']").val();
+                var retail_c = $("[name='retailSelect2']").val();
+
+                if (retail_c == '') {
+                    alert('Select a retail store to confirm sale !');
+                }
+                else {
+                    var url = "http://"+localIP+"/onlineretail/index.php?operation=5&quantity="+qty_c+"&retail_id="+retail_c+"&product_id="+product_id;
+
+                    $.get(url, function(data,status) {
+                            alert(data);
+                            $.mobile.changePage("#pageseven", {reverse:false, transition:"slide"});
+                    });
+
+                    listAdminSales();
+                }
+                
+            }
+
+
+            function insertSale() {
+                var qty_c = $("[name='qty']").val();
+                var url = "http://"+localIP+"/onlineretail/index.php?operation=5&quantity="+qty_c+"&retail_id="+retail_id+"&product_id="+product_id;
+
+                $.get(url, function(data,status) {
+                        alert(data);
+                        $.mobile.changePage("#pagethree", {reverse:false, transition:"slide"});
+                });
+
+                listSales();
+            }
+
+
+            function dateChange(date_) {
+                var date = date_.value;
+                var url = "http://"+localIP+"/onlineretail/admin.php?operation=6&date="+date;
+
+                $.get(url, function(data,status) {
+                    const arr = data.split("||");
+                    $("#output3").html(arr[0]).listview('refresh');
+                });
+
+            }
+
+
+            function createShoe() {
+                var name_c = $("[name='product_name']").val();
+                var price_c = $("[name='product_price']").val();
+                var desc_c = $("[name='product_desc']").val();
+                var qty_c = $("[name='product_qty']").val();
+                var image_c = $("[name='product_image']").val();
+
+                if (name_c != '' && price_c != '' && desc_c != '' && qty_c != '' && image_c != '') {
+                    var url = "http://"+localIP+"/onlineretail/admin.php?operation=9&name="+name_c+"&price="+price_c+"&desc="+desc_c+"&qty="+qty_c+"&image="+image_c;
+
+                    $.get(url, function(data,status) {
+                        alert(data);
+                        listShoes();
+                        $.mobile.changePage("#pageseven", {reverse:false, transition:"slide"});
+                    });
+                }
+                else {
+                    alert('Every field must be entered !');
+                }  
+            }
+
+
+            function loadChart() {
+
+                    var url = "http://"+localIP+"/onlineretail/admin.php?operation=11";
+
+                    $.get(url, function(data,status) {
+                        $("#chart").html(data).enhanceWithin().enhanceWithin("refresh");
+                        $.mobile.changePage("#pagethirteen", {reverse:false, transition:"slide"});
+                    });
+
+            }
+            
+		</script>
+
+        <style>
+            @media only screen and (max-width: 500px) {
+                #submitButtons {
+                    display: block !important;
+                }
+            }
+
+            #output li {
+                animation: 0.5s all ease-in-out;
+                border: 2px solid black;
+            }
+
+            #output li:hover {
+                animation: 0.5s all ease-in-out;
+                border: 2px solid purple;
+                border-radius: 5px;
+            }
+
+            .center-div {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            width: 80%;
+            max-width: 600px;
+            padding: 20px;
+            background-color: lightgray;
+            border-radius: 10px;
+            }
+
+             .divs div {
+                margin-bottom: 20px;
+            }
+
+            .divs {
+                margin-top: 70px;
+            }
+
+        </style>
+		
+
+
+    </head>
+    <body>
+        
+        <!--Login Page-->
+       <div data-role="page" id="pageone" data-theme="a" style="background: url(imgs/BG.jpg);">
+
+            <div class="center-div" data-role="main" class="ui-content">
+                <img src="https://i.ibb.co/RNMsZPk/blue-shoe.png" width="128px" alt="Blue shoe logo">
+                <h1>Retail Login</h1>
+                 <label style="display: flex; justify-content: left; margin: 0 5px;" class="ui-visible-accessible">Username</label><input name="username" type="text" placeholder="Enter username"/>
+                 <br>
+                 <label style="display: flex; justify-content: left; margin: 0 5px;" class="ui-visible-accessible">Password</label><input name="password" type="password" placeholder="Enter password"/>
+                 <br>
+                 <input  type="submit" value="Login" onclick="login()">
+
+
+                 <a href="#pagetwo" class="ui-btn-icon-right" >Home</a>
+                 <br>
+            </div>
+        
+        </div>
+
+
+        <!--Home Page-->
+        <div data-role="page" id="pagetwo" data-theme="a" style="background-color: cornflowerblue;">
+            <div id="header" data-role="header">
+                <h1>Retail Shoe Sales</h1>
+                <a href="#pageone" style="width: 50px; background-color: red; color: white;" class="ui-btn-right ui-btn ui-btn-b ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-delete" data-transition="slide" data-direction="reverse">Log Out</a>
+                <div data-role="navbar">
+                    <ul>
+                        <li><a href="#pagetwo" data-icon="home">Home</a></li>
+                        <li><a href="#pagethree" data-icon="grid">Insert Sale</a></li>
+                        <li><a href="#pagefive" data-icon="info">View my Sales</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div data-role="main">
+                <div style="text-align: center;">
+                    <img src="https://i.ibb.co/RNMsZPk/blue-shoe.png" width="128px" alt="Blue shoe logo">
+                    <h1 style="margin-top: 0; font-size: 30px; text-shadow: none; color: white;">Welcome<br>Start Inserting or View Sales</h1>
+                    
+                </div>
+
+                <div id="bg-wrap">
+                    
+                    <svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice">
+                    <defs>
+                    <radialGradient id="Gradient1" cx="50%" cy="50%" fx="0.441602%" fy="50%" r=".5"><animate attributeName="fx" dur="34s" values="0%;3%;0%" repeatCount="indefinite"></animate><stop offset="0%" stop-color="rgba(255, 0, 255, 1)"></stop><stop offset="100%" stop-color="rgba(255, 0, 255, 0)"></stop></radialGradient>
+                    <radialGradient id="Gradient2" cx="50%" cy="50%" fx="2.68147%" fy="50%" r=".5"><animate attributeName="fx" dur="23.5s" values="0%;3%;0%" repeatCount="indefinite"></animate><stop offset="0%" stop-color="rgba(255, 255, 0, 1)"></stop><stop offset="100%" stop-color="rgba(255, 255, 0, 0)"></stop></radialGradient>
+                    <radialGradient id="Gradient3" cx="50%" cy="50%" fx="0.836536%" fy="50%" r=".5"><animate attributeName="fx" dur="21.5s" values="0%;3%;0%" repeatCount="indefinite"></animate><stop offset="0%" stop-color="rgba(0, 255, 255, 1)"></stop><stop offset="100%" stop-color="rgba(0, 255, 255, 0)"></stop></radialGradient>
+                    <radialGradient id="Gradient4" cx="50%" cy="50%" fx="4.56417%" fy="50%" r=".5"><animate attributeName="fx" dur="23s" values="0%;5%;0%" repeatCount="indefinite"></animate><stop offset="0%" stop-color="rgba(0, 255, 0, 1)"></stop><stop offset="100%" stop-color="rgba(0, 255, 0, 0)"></stop></radialGradient>
+                    <radialGradient id="Gradient5" cx="50%" cy="50%" fx="2.65405%" fy="50%" r=".5"><animate attributeName="fx" dur="24.5s" values="0%;5%;0%" repeatCount="indefinite"></animate><stop offset="0%" stop-color="rgba(0,0,255, 1)"></stop><stop offset="100%" stop-color="rgba(0,0,255, 0)"></stop></radialGradient>
+                    <radialGradient id="Gradient6" cx="50%" cy="50%" fx="0.981338%" fy="50%" r=".5"><animate attributeName="fx" dur="25.5s" values="0%;5%;0%" repeatCount="indefinite"></animate><stop offset="0%" stop-color="rgba(255,0,0, 1)"></stop><stop offset="100%" stop-color="rgba(255,0,0, 0)"></stop></radialGradient>
+                    </defs>
+                    <!--<rect x="0" y="0" width="100%" height="100%" fill="url(#Gradient4)">
+                    <animate attributeName="x" dur="20s" values="25%;0%;25%" repeatCount="indefinite" />
+                    <animate attributeName="y" dur="21s" values="0%;25%;0%" repeatCount="indefinite" />
+                    <animateTransform attributeName="transform" type="rotate" from="0 50 50" to="360 50 50" dur="17s" repeatCount="indefinite"/>
+                    </rect>
+                    <rect x="0" y="0" width="100%" height="100%" fill="url(#Gradient5)">
+                    <animate attributeName="x" dur="23s" values="0%;-25%;0%" repeatCount="indefinite" />
+                    <animate attributeName="y" dur="24s" values="25%;-25%;25%" repeatCount="indefinite" />
+                    <animateTransform attributeName="transform" type="rotate" from="0 50 50" to="360 50 50" dur="18s" repeatCount="indefinite"/>
+                    </rect>
+                    <rect x="0" y="0" width="100%" height="100%" fill="url(#Gradient6)">
+                    <animate attributeName="x" dur="25s" values="-25%;0%;-25%" repeatCount="indefinite" />
+                    <animate attributeName="y" dur="26s" values="0%;-25%;0%" repeatCount="indefinite" />
+                    <animateTransform attributeName="transform" type="rotate" from="360 50 50" to="0 50 50" dur="19s" repeatCount="indefinite"/>
+                    </rect>-->
+                    <rect x="13.744%" y="1.18473%" width="100%" height="100%" fill="url(#Gradient1)" transform="rotate(334.41 50 50)"><animate attributeName="x" dur="20s" values="25%;0%;25%" repeatCount="indefinite"></animate><animate attributeName="y" dur="21s" values="0%;25%;0%" repeatCount="indefinite"></animate><animateTransform attributeName="transform" type="rotate" from="0 50 50" to="360 50 50" dur="7s" repeatCount="indefinite"></animateTransform></rect>
+                    <rect x="-2.17916%" y="35.4267%" width="100%" height="100%" fill="url(#Gradient2)" transform="rotate(255.072 50 50)"><animate attributeName="x" dur="23s" values="-25%;0%;-25%" repeatCount="indefinite"></animate><animate attributeName="y" dur="24s" values="0%;50%;0%" repeatCount="indefinite"></animate><animateTransform attributeName="transform" type="rotate" from="0 50 50" to="360 50 50" dur="12s" repeatCount="indefinite"></animateTransform>
+                    </rect>
+                    <rect x="9.00483%" y="14.5733%" width="100%" height="100%" fill="url(#Gradient3)" transform="rotate(139.903 50 50)"><animate attributeName="x" dur="25s" values="0%;25%;0%" repeatCount="indefinite"></animate><animate attributeName="y" dur="12s" values="0%;25%;0%" repeatCount="indefinite"></animate><animateTransform attributeName="transform" type="rotate" from="360 50 50" to="0 50 50" dur="9s" repeatCount="indefinite"></animateTransform>
+                    </rect>
+                    </svg>
+                  </div>
+                
+            </div>
+        </div>
+
+
+        <!--Shoe List Page-->
+        <div data-role="page" id="pagethree" data-theme="a" style="background-color: cornflowerblue;">
+
+            <div id="header" data-role="header" data-position="fixed">
+                <h1>Retail Shoe Sales</h1>
+                <a href="#pageone" style="width: 50px; background-color: red; color: white;" class="ui-btn-right ui-btn ui-btn-b ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-delete" data-transition="slide" data-direction="reverse">Log Out</a>
+                <div data-role="navbar">
+                    <ul>
+                        <li><a href="#pagetwo" data-icon="home">Home</a></li>
+                        <li><a href="#pagethree" data-icon="grid">Insert Sale</a></li>
+                        <li><a href="#pagefive" data-icon="info">View my Sales</a></li>
+                    </ul>
+                </div>
+            </div>
+        
+            <div data-role="main" class="ui-content">  
+                <h1 style="color: white;">Choose a shoe</h1>
+                <div style="background-color: white; padding: 10px; border-radius: 10px; ">
+                    <ul  id="output" data-role="listview" data-filter="true" data-filter-placeholder="Search shoes..." data-inset="true"></ul>
+                </div>
+            </div>
+        
+                
+        </div>
+
+
+        <!--Registration Page-->
+        <div data-role="page" id="pagefour" data-theme="a" style="background-color: cornflowerblue;">
+                <div class="center-div" data-role="main" class="ui-content">
+                    <a href="#pageone" style="width: 50px;" class="ui-btn ui-shadow ui-corner-all ui-icon-arrow-l ui-btn-icon-left" data-transition="slide" data-direction="reverse">Back</a>
+                    <h1>Retail Registration Form</h1>
+                    <label style="display: flex; justify-content: left; margin: 0 5px;" class="ui-visible-accessible">Username</label><input name="username2" type="text" placeholder="Enter username"/>
+                    <br>
+                    <label style="display: flex; justify-content: left; margin: 0 5px;" class="ui-visible-accessible">Password</label><input name="password2" type="password" placeholder="Enter password"/>
+                    <br>
+                    <label style="display: flex; justify-content: left; margin: 0 5px;" class="ui-visible-accessible">Location</label><input name="location" type="text" placeholder="Enter location"/>
+                    <br>
+                    <input type="submit" value="Submit" onclick="registrationProcess()">
+                </div>
+        </div>
+
+
+        <!--List all Sales-->
+        <div data-role="page" id="pagefive" data-theme="a" style="background-color: cornflowerblue;">
+            <div id="header" data-role="header" data-position="fixed">
+                <h1>Retail Shoe Sales</h1>
+                <a href="#pageone" style="width: 50px; background-color: red; color: white;" class="ui-btn-right ui-btn ui-btn-b ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-delete" data-transition="slide" data-direction="reverse">Log Out</a>
+                <div data-role="navbar">
+                    <ul>
+                        <li><a href="#pagetwo" data-icon="home">Home</a></li>
+                        <li><a href="#pagethree" data-icon="grid">Insert Sale</a></li>
+                        <li><a href="#pagefive" data-icon="info">View my Sales</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div data-role="main" class="ui-content">  
+                <div style="background-color: white; padding: 10px; border-radius: 10px; ">
+                    <ul  id="output2" data-role="listview" data-filter="true" data-filter-placeholder="Search sales..." data-inset="true"></ul>
+                </div>
+            </div>
+        </div>
+
+
+        <!--Single Shoe Page-->
+        <div data-role="page" id="pagesix" data-theme="a" style="background-color: cornflowerblue;">
+            <div data-role="header" data-position="fixed">
+                
+                <h1>Insert sale details</h1>
+                <a href="#pagethree" class="ui-btn ui-shadow ui-corner-all ui-icon-arrow-l ui-btn-icon-back">Back</a>
+            </div>
+
+            <div data-role="main">
+                <div id="shoeTop"></div>
+                <br><br>
+                <div style="margin: 0 20px; border: 5px solid cadetblue; border-radius: 5px;" >
+                    <ul id="shoeDetails" data-role="listview"></ul>
+                </div>
+
+                <div id="salesInsert" style="margin: 0 30px;">
+                    
+                </div>
+                
+            </div>
+        </div>
+
+
+
+        <!--Start of Admin Page-->
+        <div data-role="page" id="pageseven" data-theme="a" style="background-color: cornflowerblue;">
+            
+                
+                <div data-role="panel" id="mypanel" data-display="overlay">
+                    
+                    <div class="divs">
+                        <div>
+                            <a href="#pageseven" data-rel="close" style="background-color: #70D1F4;" class="ui-btn ui-shadow ui-corner-all">View Sales</a>
+                        </div>
+                        <div>
+                            <a href="#pageeight" onclick="loadRetails2()" style="background-color: #70D1F4;" class="ui-btn ui-shadow ui-corner-all">Create Sale</a>
+                        </div>
+                        <div>
+                        <a href="#pageeleven" style="background-color: #70D1F4;" class="ui-btn ui-shadow ui-corner-all">Create Product</a>
+                        </div>
+                        <div>
+                         <a href="#pagetwelve" style="background-color: #70D1F4;" class="ui-btn ui-shadow ui-corner-all">View Locations</a>
+                        </div>
+                        <div>
+                        <a href="#pagethirteen" onclick="loadChart()" style="background-color: #70D1F4;" class="ui-btn ui-shadow ui-corner-all">Sales Stats</a>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <a href="" data-swipe="false" data-rel="close" style="background-color: red; width: 50px; color: white;" class="ui-btn ui-btn-right ui-shadow ui-corner-all ui-btn-icon-right ui-icon-delete">Close</a>
+                    </div> 
+                    
+                </div>
+
+                <div data-role="header" data-position="fixed">
+                    <a href="#mypanel" style="width: 50px;" class="ui-btn-left ui-btn ui-btn-b ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-bars" data-transition="slide" data-direction="reverse">Menu</a>
+                    <h1>Welcome Admin</h1>
+                    <a href="#pageone" style="width: 50px; background-color: red; color: white;" class="ui-btn-right ui-btn ui-btn-b ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-delete" data-transition="slide" data-direction="reverse">Log Out</a>
+                </div>
+                
+
+                <div data-role="main" class="ui-content">
+                    <div style="display: flex; justify-content: center;">
+                        <h1 style="color: white;">Retail Sales List</h1>
+                    </div>
+                    <div class="ui-field-contain">
+                        <h3 style="color: white;">Select region</h3>
+                        <select onchange="listAdminSales()" id="retailSelect" name="retails">
+                            <option value="">Choose...</option>
+                        </select>
+                    </div>
+
+                    <div id="datePicker">
+
+                    </div>
+                    <div style="background-color: white; padding: 10px; border-radius: 10px; ">
+                        <ul  id="output3" data-role="listview" data-filter="true" data-filter-placeholder="Search shoe sales..." data-inset="true"></ul>
+                    </div>
+                </div>
+            </div>
+
+
+
+
+            <!--Create Sale Page-->
+            <div data-role="page" id="pageeight" data-theme="a" style="background-color: cornflowerblue;">
+            
+                
+                <div data-role="panel" id="mypanel2" data-display="overlay">
+                    
+                    <div class="divs">
+                        <div>
+                            <a href="#pageseven" style="background-color: #70D1F4;" class="ui-btn ui-shadow ui-corner-all">View Sales</a>
+                        </div>
+                        <div>
+                            <a href="" data-rel="close" style="background-color: #70D1F4;" class="ui-btn ui-shadow ui-corner-all">Create Sale</a>
+                        </div>
+                        <div>
+                        <a href="#pageeleven" style="background-color: #70D1F4;" class="ui-btn ui-shadow ui-corner-all">Create Product</a>
+                        </div>
+                        <div>
+                         <a href="#pagetwelve" style="background-color: #70D1F4;" class="ui-btn ui-shadow ui-corner-all">View Locations</a>
+                        </div>
+                        <div>
+                        <a href="#pagethirteen" style="background-color: #70D1F4;" class="ui-btn ui-shadow ui-corner-all">Sales Stats</a>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <a href="" data-swipe="false" data-rel="close" style="background-color: red; width: 50px; color: white;" class="ui-btn ui-btn-right ui-shadow ui-corner-all ui-btn-icon-right ui-icon-delete">Close</a>
+                    </div> 
+                    
+                </div>
+
+                <div data-role="header">
+                    <a href="#mypanel2" style="width: 50px;" class="ui-btn-left ui-btn ui-btn-b ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-bars" data-transition="slide" data-direction="reverse">Menu</a>
+                    <h1>Welcome Admin</h1>
+                    <a href="#pageone" style="width: 50px; background-color: red; color: white;" class="ui-btn-right ui-btn ui-btn-b ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-delete" data-transition="slide" data-direction="reverse">Log Out</a>
+                </div>
+                
+
+                <div data-role="main" class="ui-content">
+                    <h1 style="color: white;">Create Sale</h1>
+
+                    <div class="ui-field-contain">
+                        <h3 style="color: white;">Select region</h3>
+                        <select id="retailSelect2" name="retailSelect2">
+                            <option value="">Choose...</option>
+                        </select>
+                    </div>
+
+                        <h1 style="color: white;">Choose a shoe</h1>
+                        <div style="background-color: white; padding: 10px; border-radius: 10px; ">
+                            <ul  id="output6" data-role="listview" data-filter="true" data-filter-placeholder="Search shoes..." data-inset="true"></ul>
+                        </div>
+                </div>
+            </div>
+
+
+            <!--Page for Sale Update-->
+            <div data-role="page" id="pagenine" data-theme="a" style="background-color: cornflowerblue;">
+                <div data-role="header" data-position="fixed">
+                    <h1 id="usaleheader"></h1>
+
+                        <a href="#pageseven" style="background-color: black; color: white;" class="ui-btn ui-shadow ui-corner-all ui-icon-arrow-l ui-btn-icon-back">Back</a>
+                    
+                </div>
+    
+                <div data-role="main">
+                    <div>
+                        <div id="shoeTop2"></div>
+                        <br><br>
+                        <div id="inputs" style="margin: 0 20px; padding-top: 5px; padding-bottom: 20px; padding-left: 30px; padding-right: 30px; background-color: white; border-radius: 5px;" >
+
+                        </div>
+        
+                        <div style="display: flex; justify-content: center;">
+                            <div id="updateConfirm" style="margin: 30px; width: 200px;">
+                            
+                            </div>
+                        </div>
+                        
+                    </div>
+                    
+                    
+                </div>
+            </div>
+
+
+            <!--Admin Single Shoe Page-->
+        <div data-role="page" id="pageten" data-theme="a" style="background-color: cornflowerblue;">
+            <div data-role="header" data-position="fixed">
+                
+                <h1>Insert sale details</h1>
+                <a href="#pageeight" class="ui-btn ui-shadow ui-corner-all ui-icon-arrow-l ui-btn-icon-back">Back</a>
+            </div>
+
+            <div data-role="main">
+                <div id="shoeTop5"></div>
+                <br><br>
+                <div style="margin: 0 20px; border: 5px solid cadetblue; border-radius: 5px;" >
+                    <ul id="shoeDetails5" data-role="listview"></ul>
+                </div>
+
+                <div id="salesInsert5" style="margin: 0 30px;">
+                    
+                </div>
+                
+            </div>
+        </div>
+
+
+
+        <!--Admin Insert Shoe Page-->
+        <div data-role="page" id="pageeleven" data-theme="a" style="background-color: cornflowerblue;">
+            <div data-role="header" data-position="fixed">
+                
+                <h1>Insert Shoe details</h1>
+                <a href="#pageseven" class="ui-btn ui-shadow ui-corner-all ui-icon-arrow-l ui-btn-icon-back">Back</a>
+            </div>
+
+            <div data-role="main" class="ui-content">
+                <div id="">
+                    <br>
+                    <label for="" style="color: white; text-shadow: none;">Enter shoe name</label>
+                    <input type="text" name="product_name" id="product_name" placeholder="Enter shoe name">
+                    <br>
+                    <label for="" style="color: white; text-shadow: none;">Enter shoe price</label>
+                    <input type="number" name="product_price" id="product_price" placeholder="Enter shoe price">
+                    <br>
+                    <label for="" style="color: white; text-shadow: none;">Enter shoe description</label>
+                    <input type="text" name="product_desc" id="product_desc" placeholder="Enter shoe description">
+                    <br>
+                    <label for="" style="color: white; text-shadow: none;">Enter shoe quantity</label>
+                    <input type="number" name="product_qty" id="product_qty" placeholder="Enter shoe quantity">
+                    <br>
+                    <label for="" style="color: white; text-shadow: none;">Enter image URL</label>
+                    <input type="text" name="product_image" id="product_image" placeholder="Enter shoe image URL ">
+                </div>
+                <br><br>
+                <div style="margin: 0 20px;" >
+                    <input type="submit" onclick="createShoe()" name="" id="productSubmit" value="Create Shoe">
+                </div>
+                
+            </div>
+        </div>
+
+
+
+
+        <!--Retails Location Page-->
+        <div data-role="page" id="pagetwelve" data-theme="a" style="background-color: cornflowerblue;">
+            
+                
+            <div data-role="panel" id="mypanel5" data-display="overlay">
+                
+                <div class="divs">
+                    <div>
+                        <a href="#pageseven" data-rel="close" style="background-color: #70D1F4;" class="ui-btn ui-shadow ui-corner-all">View Sales</a>
+                    </div>
+                    <div>
+                        <a href="#pageeight" onclick="loadRetails2()" style="background-color: #70D1F4;" class="ui-btn ui-shadow ui-corner-all">Create Sale</a>
+                    </div>
+                    <div>
+                    <a href="#pageeleven" style="background-color: #70D1F4;" class="ui-btn ui-shadow ui-corner-all">Create Product</a>
+                    </div>
+                    <div>
+                     <a href="#pagetwelve" style="background-color: #70D1F4;" data-rel="close" class="ui-btn ui-shadow ui-corner-all">View Locations</a>
+                    </div>
+                    <div>
+                    <a href="#pagethirteen" style="background-color: #70D1F4;" class="ui-btn ui-shadow ui-corner-all">Sales Stats</a>
+                    </div>
+                </div>
+                
+                <div>
+                    <a href="" data-swipe="false" data-rel="close" style="background-color: red; width: 50px; color: white;" class="ui-btn ui-btn-right ui-shadow ui-corner-all ui-btn-icon-right ui-icon-delete">Close</a>
+                </div> 
+                
+            </div>
+
+            <div data-role="header" data-position="fixed">
+                <a href="#mypanel5" style="width: 50px;" class="ui-btn-left ui-btn ui-btn-b ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-bars" data-transition="slide" data-direction="reverse">Menu</a>
+                <h1>Welcome Admin</h1>
+                <a href="#pageone" style="width: 50px; background-color: red; color: white;" class="ui-btn-right ui-btn ui-btn-b ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-delete" data-transition="slide" data-direction="reverse">Log Out</a>
+            </div>
+            
+
+            <div data-role="main" class="ui-content">
+                <div style="display: flex; justify-content: center;">
+                    <h1 style="color: white;">Retail Location</h1>
+                </div>
+                <div class="ui-field-contain">
+                    <h3 style="color: white;">Select region</h3>
+                    <select onchange="displayLocationMap()" id="retailSelect5" name="retails5">
+                        <option value="">Choose...</option>
+                    </select>
+                </div>
+
+
+                <div style="background-color: white; border-radius: 10px; width: 100%; height: 400px; display: none;" id="map">
+                    
+                </div>
+            </div>
+        </div>
+
+
+
+        <!--Retails Location Page-->
+        <div data-role="page" id="pagethirteen" data-theme="a" style="background-color: cornflowerblue;">
+            
+                
+            <div data-role="panel" id="mypanel5" data-display="overlay">
+                
+                <div class="divs">
+                    <div>
+                        <a href="#pageseven" data-rel="close" style="background-color: #70D1F4;" class="ui-btn ui-shadow ui-corner-all">View Sales</a>
+                    </div>
+                    <div>
+                        <a href="#pageeight" onclick="loadRetails2()" style="background-color: #70D1F4;" class="ui-btn ui-shadow ui-corner-all">Create Sale</a>
+                    </div>
+                    <div>
+                    <a href="#pageeleven" style="background-color: #70D1F4;" class="ui-btn ui-shadow ui-corner-all">Create Product</a>
+                    </div>
+                    <div>
+                     <a href="#pagetwelve" style="background-color: #70D1F4;" class="ui-btn ui-shadow ui-corner-all">View Locations</a>
+                    </div>
+                    <div>
+                    <a href="#pagethirteen" style="background-color: #70D1F4;" data-rel="close" class="ui-btn ui-shadow ui-corner-all">Sales Stats</a>
+                    </div>
+                </div>
+                
+                <div>
+                    <a href="" data-swipe="false" data-rel="close" style="background-color: red; width: 50px; color: white;" class="ui-btn ui-btn-right ui-shadow ui-corner-all ui-btn-icon-right ui-icon-delete">Close</a>
+                </div> 
+                
+            </div>
+
+            <div data-role="header" data-position="fixed">
+                <a href="#mypanel5" style="width: 50px;" class="ui-btn-left ui-btn ui-btn-b ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-bars" data-transition="slide" data-direction="reverse">Menu</a>
+                <h1>Welcome Admin</h1>
+                <a href="#pageone" style="width: 50px; background-color: red; color: white;" class="ui-btn-right ui-btn ui-btn-b ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-delete" data-transition="slide" data-direction="reverse">Log Out</a>
+            </div>
+            
+
+            <div data-role="main" class="ui-content">
+                <div style="display: flex; justify-content: center;">
+                    <h1 style="color: white;">Sales Statistics</h1>
+                </div>
+
+
+
+                <div style="background-color: white; border-radius: 10px; width: 100%; height: 400px; overflow: auto;" id="chart">
+                    
+                </div>
+            </div>
+        </div>
+
+            
+        </div>
+	
+    </body>
+</html>

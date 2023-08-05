@@ -1,0 +1,116 @@
+.m-0{
+    margin: 0;
+}
+.bdr-red{
+    border: 3px solid red;
+}
+a{
+    text-decoration: none;
+    color: black;
+}
+.center-h{
+    margin: 0 auto;
+}
+.center-v{
+    display: flex;
+    align-items: center;
+    
+}
+.center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+.fit-content{
+    width: fit-content;
+}
+.d-flex{
+    display: flex;
+}
+.card{
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 10px;
+}
+.title{
+    font-size: 20px;
+    font-weight: 700;
+    text-align: center;
+}
+.home-title{
+    margin-top: 20px;
+}
+
+.info{
+    padding: 0 20px;
+}
+
+#productname, #quantity,#price, #shopname,#totalsales{
+    font-size: 18px;
+    font-weight: 600;
+    color: #6342E8;
+}
+#category,#address{
+    margin: 0 -3px;
+}
+
+.price{
+    width: 100%;
+}
+
+
+/* Images css */
+.list-img{
+    width: 100px;
+    height: auto;
+}
+.home-logo{
+    width: 90px;
+    height: auto;
+}
+.logo{
+    width: 300px;
+    margin-bottom: 20px;
+}
+.mt-30{
+    margin-top: 30px;
+}
+
+
+/* Text css */
+.sum{
+    font-size: 18px;
+    font-weight: 600;
+    color: #6342E8;
+}
+#date{
+
+}
+/* Others */
+@media only screen and (max-width: 500px) {
+    #submitButtons {
+    display: block !important;
+}
+}
+
+
+#output li {
+    animation: 0.5s all ease-in-out;
+    border: 2px solid black;
+}
+
+#output li:hover {
+    animation: 0.5s all ease-in-out;
+    border: 2px solid purple;
+    border-radius: 5px;
+}
+
+
+.divs div {
+    margin-bottom: 20px;
+}
+
+.divs {
+    margin-top: 70px;
+}

@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+    <link rel="stylesheet" href="js/jquery.mobile-1.4.5.css">
+    <script src="js/jquery.js"></script>
+    <script src="js/jquery.mobile-1.4.5.js"></script>
+    <script type="text/javascript" src="cordova.js"></script>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <title>Retail App</title>
+
+    <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="css/width.css">
+    <script>
+        $(document).on('click', '#backButton', function() {
+            // Use history.back() to go back to the previous page
+            history.back();
+        });
+        
+    </script>
+</head>
+<body>
+    <!--Login Page-->
+    <div data-role="page" id="login" data-theme="a" 
+    style="background: rgb(156,63,255); background: linear-gradient(0deg, rgba(156,63,255,1) 2%, rgba(92,187,255,1) 63%);">
+        <div class="center card w-80" data-role="main" class="ui-content">
+            <img src="imgs/BComplete.svg" alt="Blue shoe logo" class="logo">
+            <label style="justify-content: left; margin: 0 5px;" class="ui-visible-accessible">Username</label>
+            <input name="username" type="text" placeholder="Enter username" autocomplete="off" class="username" required/>
+
+            <label style="justify-content: left; margin: 0 5px;" class="ui-visible-accessible">Password</label>
+            <input name="password" type="password" placeholder="Enter password" autocomplete="off" class="password" required/>
+            
+            <input  type="submit" value="Login" class="login"  data-transition="slidefade" onclick="login()" style="margin: 20px;">
+            <a href="#home" class="ui-btn ui-btn-icon" data-transition="slide" style="background-color: chartreuse;">Sales Home</a>
+            <a href="#MNGhome" class="ui-btn ui-btn-icon" data-transition="slide" style="background-color: rgb(255, 191, 0);">MNG home</a>
+        </div>
+    </div>
+
+    <!-- Home Page -->
+    <div data-role="page" id="home" data-theme="a" class=" "
+    style="background: rgb(156,63,255); background: linear-gradient(0deg, rgba(156,63,255,1) 2%, rgba(92,187,255,1) 63%);">
+        <div data-role="main" class="ui-content">
+            <!-- Header -->
+            <div class="header d-flex card">
+                
+                <p class="title center-h">Home</p>
+            </div>
+
+            <div style="margin-top: 20%;" class="">
+                <div>
+                    <a href="#newsales" data-transition="slide">
+                        <div class="card">
+                            <img src="imgs/sell.png" alt="" class="d-flex home-logo center-h ">
+                            <p class="title home-title center-h">Purform New Sale</p>
+                        </div>
+                    </a>
+                </div>
+
+                <div style="margin-top: 30px;">
+                    <a href="#stock" data-transition="slide">
+                        <div class="card">
+                            <img src="imgs/stock.png" alt="" class="d-flex home-logo center-h ">
+                            <p class="title home-title center-h">View & Manage Stock</p>
+                        </div>
+                    </a>
+                </div>
+                <div style="margin-top: 30px;">
+                    <a href="#login" data-transition="slide">
+                        <div class="card">
+                            <img src="imgs/logout.png" alt="" class="d-flex home-logo center-h ">
+                            <p class="title home-title center-h" style="color:crimson">LOGOUT</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- New Sales -->
+    <div data-role="page" id="newsales" data-theme="a" class=" "
+    style="background: rgb(156,63,255); background: linear-gradient(0deg, rgba(156,63,255,1) 2%, rgba(92,187,255,1) 63%);">
+        <div data-role="main" class="ui-content">
+            <!-- Header -->
+            <div class="header d-flex card">
+                <div class="center-v fit-content">
+                    <img src="imgs/back.png" alt="backButton" id="backButton" style="width: 25px;"> 
+                </div>
+                <p class="title center-h">Sales</p>
+            </div>
+            <a href="#" id="saveButton" class="ui-btn ui-btn-a ui-corner-all" data-transition="slide" data-ajax="false">Proceed Sales</a>
+            <div class="card d-flex" style="margin-top: 30px;">
+                <img src="imgs/cloth/shirt.png" class="list-img">
+
+                <div class="info center-h center-v">
+                    <div class="name-categ">
+                        <p id="productname" style="padding: 0; margin:0 ;">Shirt</p>
+                        <p id="category">category</p>
+                    </div>
+                </div>
+                <div class="center-v">
+                    <div style="padding: 10px; background: #90909055; border-radius: 10px;">
+                        <div class="center-h fit-content">
+                            <a id="Add"><img src="imgs/plus.png" alt="" class="addless " style="width: 25px;"></a>
+                        </div>
+        
+                        <input type="number" class="form-control form" value="0" style="text-align: center;">
+        
+                        <div class="center-h fit-content">
+                            <a id="minus"><img src="imgs/minus.png" alt="" class="addless" style="width: 25px;"></a>
+        
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+        <div data-role="footer" data-position="fixed">
+            <h4 id="totalsales">$654</h4>
+        </div>
+        
+    </div>
+
+    <!-- stock -->
+    <div data-role="page" id="stock" data-theme="a" class=" "
+    style="background: rgb(156,63,255); background: linear-gradient(0deg, rgba(156,63,255,1) 2%, rgba(92,187,255,1) 63%);">
+        <div data-role="main" class="ui-content">
+            <!-- Header -->
+            <div class="header d-flex card">
+                <div class="center-v fit-content">
+                    <img src="imgs/back.png" alt="backButton" id="backButton" style="width: 25px;"> 
+                </div>
+                <p class="title center-h">Manage Stock</p>
+            </div>
+
+            <div class="" style="padding: 10px;">
+                <a href="#newstock" class="ui-btn ui-btn-corner-all" data-transition="slide">Update Stock</a>
+                <ul  id="stocks" data-role="listview" data-filter="true" data-filter-placeholder="Search sales..." data-inset="true">
+                    
+                </ul>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- New Stock -->
+    <div data-role="page" id="newstock" data-theme="a" class=""
+    style="background: rgb(156,63,255); background: linear-gradient(0deg, rgba(156,63,255,1) 2%, rgba(92,187,255,1) 63%);">
+        <div data-role="main" class="ui-content">
+            <!-- Header -->
+            <div class="header d-flex card">
+                <div class="center-v fit-content">
+                    <img src="imgs/back.png" alt="backButton" id="backButton" style="width: 25px;"> 
+                </div>
+                <p class="title center-h">Update Stock</p>
+            </div>
+            <!-- Main -->
+            <a href="#" id="saveButton" class="ui-btn ui-btn-a ui-corner-all" data-transition="slide" data-ajax="false">Update & Save Stock</a>
+            <div class="card d-flex" style="margin-top: 30px;">
+                <img src="imgs/cloth/shirt.png" class="list-img">
+
+                <div class="info center-h">
+                    <div class="name-categ">
+                        <p id="productname" style="padding: 0; margin-bottom:0 ;">Shirt</p>
+                        <p id="category">category</p>
+                    </div>
+                    <div class="quant">
+                        <p id="quantity">X 15</p>
+                    </div>
+                </div>
+                <div class="center-v">
+                    <div style="padding: 10px; background: #90909055; border-radius: 10px;">
+                        <div class="center-h fit-content">
+                            <a id="Add"><img src="imgs/plus.png" alt="" class="addless " style="width: 25px;"></a>
+                        </div>
+        
+                        <input type="number" class="form-control form" value="0" style="text-align: center;">
+        
+                        <div class="center-h fit-content">
+                            <a id="minus"><img src="imgs/minus.png" alt="" class="addless" style="width: 25px;"></a>
+        
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+           
+                  
+                
+
+        </div>
+    </div>
+
+
+    <!-- Manager Home Page -->
+    <div data-role="page" id="MNGhome" data-theme="a" class=" "
+    style="background: rgb(156,63,255); background: linear-gradient(0deg, rgba(156,63,255,1) 2%, rgba(92,187,255,1) 63%);">
+        <div data-role="main" class="ui-content">
+            <!-- Header -->
+            <div class="header d-flex card">
+                
+                <p class="title center-h">Home</p>
+            </div>
+
+            <div style="margin-top: 20%;" class="">
+                <div>
+                    <a href="#viewsales" data-transition="slide">
+                        <div class="card">
+                            <img src="imgs/viewsales.png" alt="" class="d-flex home-logo center-h ">
+                            <p class="title home-title center-h">View Sales</p>
+                        </div>
+                    </a>
+                </div>
+
+                <div style="margin-top: 30px;">
+                    <a href="#stock" data-transition="slide">
+                        <div class="card">
+                            <img src="imgs/viewproduct.png" alt="" class="d-flex home-logo center-h ">
+                            <p class="title home-title center-h">View Product</p>
+                        </div>
+                    </a>
+                </div>
+                <div style="margin-top: 30px;">
+                    <a href="#login" data-transition="slide">
+                        <div class="card">
+                            <img src="imgs/logout.png" alt="" class="d-flex home-logo center-h ">
+                            <p class="title home-title center-h" style="color:crimson">LOGOUT</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Sales -->
+    <div data-role="page" id="viewsales" data-theme="a" class=""
+    style="background: rgb(156,63,255); background: linear-gradient(0deg, rgba(156,63,255,1) 2%, rgba(92,187,255,1) 63%);">
+        <div data-role="main" class="ui-content">
+            <!-- Header -->
+            <div class="header d-flex card">
+                <div class="center-v fit-content">
+                    <img src="imgs/back.png" alt="backButton" id="backButton" style="width: 25px;"> 
+                </div>
+                <p class="title center-h">View Sales</p>
+            </div>
+            <!-- Main -->
+            <div class="card" style="margin-top: 15px;">
+                <div class="content">
+                    <div class="top d-flex">
+                        <p class="sum m-0" style="width: 75%;">Sales Summary</p>
+                        <p id="date" class="m-0 center-v">10 Jul 2023</p>
+                    </div>
+                    <div class="bottom d-flex">
+                        <p class="sum m-0" style="width: 50%;">Total Sales</p>
+                        <div class="d-flex" style="width: 50%; justify-content: flex-end;">
+                            <p id="date" class="sum m-0 center-v" >$1523</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <a href="#shopsales" data-transition="slide">
+                <div class="card d-flex mt-30">
+                    <img src="imgs/cloth/shirt.png" class="list-img ">
+    
+                    <div class="info center-h ">
+                        <div class="name-categ">
+                            <p id="shopname" style="margin: 0;">Shop</p>
+                            <p id="address">category</p>
+                        </div>
+                        <div class="quant">
+                            <p id="quantity">X 15</p>
+                        </div>
+                    </div> 
+                    <div class="info center-v ">
+                        <div class="quant ">
+                            <p id="quantity">$1549</p>
+                        </div>
+                    </div> 
+                </div>
+            </a>
+        </div>
+    </div>
+
+</body>
+</html>
+<script>
+    $(document).ready(function() {
+    // Get the input element
+    const inputElement = $(".form-control.form");
+
+    // Increment button click event
+    $("#Add").on("click", function() {
+      // Get the current value
+      let currentValue = parseInt(inputElement.val());
+      // Increment the value
+      currentValue = Math.min(1000, currentValue + 1);
+      // Update the input field value
+      inputElement.val(currentValue);
+    });
+
+    // Decrement button click event
+    $("#minus").on("click", function() {
+      // Get the current value
+      let currentValue = parseInt(inputElement.val());
+      // Decrement the value, but not below 0
+      currentValue = Math.max(0, currentValue - 1);
+      // Update the input field value
+      inputElement.val(currentValue);
+    });
+  });
+</script>
