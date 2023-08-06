@@ -50,12 +50,12 @@
                 <p class="title center-h">Home</p>
             </div>
 
-            <div style="margin-top: 20%;" class="">
+            <div  class="center" style="width: 90%;">
                 <div>
                     <a href="#newsales" data-transition="slide">
                         <div class="card">
                             <img src="imgs/sell.png" alt="" class="d-flex home-logo center-h ">
-                            <p class="title home-title center-h">Purform New Sale</p>
+                            <p class="title home-title center-h">Perform New Sale</p>
                         </div>
                     </a>
                 </div>
@@ -92,26 +92,29 @@
                 <p class="title center-h">Sales</p>
             </div>
             <a href="#" id="saveButton" class="ui-btn ui-btn-a ui-corner-all" data-transition="slide" data-ajax="false">Proceed Sales</a>
-            <div class="card d-flex" style="margin-top: 30px;">
-                <img src="imgs/cloth/shirt.png" class="list-img">
 
-                <div class="info center-h center-v">
-                    <div class="name-categ">
-                        <p id="productname" style="padding: 0; margin:0 ;">Shirt</p>
-                        <p id="category">category</p>
-                    </div>
-                </div>
-                <div class="center-v">
-                    <div style="padding: 10px; background: #90909055; border-radius: 10px;">
-                        <div class="center-h fit-content">
-                            <a id="Add"><img src="imgs/plus.png" alt="" class="addless " style="width: 25px;"></a>
+            <div id="salesproduct" style="margin-top: 30px;">
+                <div class="card d-flex">
+                    <img src="imgs/cloth/shirt.png" class="list-img">
+    
+                    <div class="info center-h center-v">
+                        <div class="name-categ">
+                            <p id="productname" style="padding: 0; margin:0 ;">Shirt</p>
+                            <p id="category">category</p>
                         </div>
-        
-                        <input type="number" class="form-control form" value="0" style="text-align: center;">
-        
-                        <div class="center-h fit-content">
-                            <a id="minus"><img src="imgs/minus.png" alt="" class="addless" style="width: 25px;"></a>
-        
+                    </div>
+                    <div class="center-v">
+                        <div style="padding: 10px; background: #90909055; border-radius: 10px;">
+                            <div class="center-h fit-content">
+                                <a id="Add"><img src="imgs/plus.png" alt="" class="addless " style="width: 25px;"></a>
+                            </div>
+            
+                            <input type="number" class="form-control form" value="0" style="text-align: center;">
+            
+                            <div class="center-h fit-content">
+                                <a id="minus"><img src="imgs/minus.png" alt="" class="addless" style="width: 25px;"></a>
+            
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -206,7 +209,7 @@
                 <p class="title center-h">Home</p>
             </div>
 
-            <div style="margin-top: 20%;" class="">
+            <div  class="center" style="width: 90%;">
                 <div>
                     <a href="#viewsales" data-transition="slide">
                         <div class="card">
@@ -313,3 +316,15 @@
     });
   });
 </script>
+
+
+
+Table: Store
+Attributes:
+store_id    number
+store_name  varchar2(255)
+store_location  varchar2(255)
+store_username  varchar2(255)
+store_password  varchar2(255)
+manager_id  number
+
