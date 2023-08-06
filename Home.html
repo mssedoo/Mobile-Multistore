@@ -144,7 +144,6 @@
             }
         
 
-
             function registration() {
                 $.mobile.changePage("#pagefour", {reverse:false, transition:"slide"});
 
@@ -453,16 +452,18 @@
 
     </head>
     <body>
-        
+         
         <!--Login Page-->
        <div data-role="page" id="pageone" data-theme="a" style="background: url(imgs/BG.jpg);">
 
             <div class="center-div" data-role="main" class="ui-content">
                 <img src="https://i.ibb.co/RNMsZPk/blue-shoe.png" width="128px" alt="Blue shoe logo">
                 <h1>Retail Login</h1>
-                 <label style="display: flex; justify-content: left; margin: 0 5px;" class="ui-visible-accessible">Username</label><input name="username" type="text" placeholder="Enter username"/>
+                 <label style="display: flex; justify-content: left; margin: 0 5px;" class="ui-visible-accessible">Username</label>
+                 <input name="username" type="text" placeholder="Enter username"/>
                  <br>
-                 <label style="display: flex; justify-content: left; margin: 0 5px;" class="ui-visible-accessible">Password</label><input name="password" type="password" placeholder="Enter password"/>
+                 <label style="display: flex; justify-content: left; margin: 0 5px;" class="ui-visible-accessible">Password</label>
+                 <input name="password" type="password" placeholder="Enter password"/>
                  <br>
                  <input  type="submit" value="Login" onclick="login()">
 

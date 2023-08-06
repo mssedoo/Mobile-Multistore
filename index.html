@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8">
@@ -13,14 +12,68 @@
     <title>Retail App</title>
 
     <link rel="stylesheet" href="css/index.css">
-    <link rel="stylesheet" href="css/width.css">
     <script>
         $(document).on('click', '#backButton', function() {
             // Use history.back() to go back to the previous page
             history.back();
         });
+
+        /*$(document).ready(function() {
+            // Get the input element
+            const inputElement = $(".form-control.form");
         
+            // Increment button click event
+            $("#Add").on("click", function() {
+            // Get the current value
+            let currentValue = parseInt(inputElement.val());
+            // Increment the value
+            currentValue = Math.min(1000, currentValue + 1);
+            // Update the input field value
+            inputElement.val(currentValue);
+            });
+        
+            // Decrement button click event
+            $("#minus").on("click", function() {
+            // Get the current value
+            let currentValue = parseInt(inputElement.val());
+            // Decrement the value, but not below 0
+            currentValue = Math.max(0, currentValue - 1);
+            // Update the input field value
+            inputElement.val(currentValue);
+            });
+        });*/
+        //--------------------------------------
+        var folderpath = "http://localhost/GitProject/Mobile-Multistore/MultistoreBack/index.php?";
+        
+        function login() {
+            var user = $("[name='username']").val();
+            var pass = $("[name='password']").val();
+            var url = folderpath+"&username="+user+"&password="+pass;
+            alert("Username: "+user+"Pass: "+pass);
+            if (user == "" || pass == "") {//if user blank
+                alert("A username and a password must be entered !");
+            }
+            else{//if user contains
+                //make a request to database to find if these exist
+                var url = folderpath+"operation=1&username="+user&"password="+pass;
+
+                $.get(url, function(data,status) {
+                    const arr = data.split("||");
+                    alert ("data "+data);
+
+                    if (data == "s"){
+                        alert("s");
+                    }else if ((data == "m")){
+                        alert("m");
+                    }else{
+                        alert("Credentials does not exist");
+                    }
+                });
+            }
+        }
     </script>
+
+
 </head>
 <body>
     <!--Login Page-->
@@ -39,7 +92,6 @@
             <a href="#MNGhome" class="ui-btn ui-btn-icon" data-transition="slide" style="background-color: rgb(255, 191, 0);">MNG home</a>
         </div>
     </div>
-
     <!-- Home Page -->
     <div data-role="page" id="home" data-theme="a" class=" "
     style="background: rgb(156,63,255); background: linear-gradient(0deg, rgba(156,63,255,1) 2%, rgba(92,187,255,1) 63%);">
@@ -79,7 +131,6 @@
             </div>
         </div>
     </div>
-    
     <!-- New Sales -->
     <div data-role="page" id="newsales" data-theme="a" class=" "
     style="background: rgb(156,63,255); background: linear-gradient(0deg, rgba(156,63,255,1) 2%, rgba(92,187,255,1) 63%);">
@@ -101,6 +152,7 @@
                         <div class="name-categ">
                             <p id="productname" style="padding: 0; margin:0 ;">Shirt</p>
                             <p id="category">category</p>
+                            <p id="productprice" style="font-weight: 600;">RS 999</p>
                         </div>
                     </div>
                     <div class="center-v">
@@ -127,7 +179,6 @@
         </div>
         
     </div>
-
     <!-- stock -->
     <div data-role="page" id="stock" data-theme="a" class=" "
     style="background: rgb(156,63,255); background: linear-gradient(0deg, rgba(156,63,255,1) 2%, rgba(92,187,255,1) 63%);">
@@ -149,7 +200,6 @@
 
         </div>
     </div>
-
     <!-- New Stock -->
     <div data-role="page" id="newstock" data-theme="a" class=""
     style="background: rgb(156,63,255); background: linear-gradient(0deg, rgba(156,63,255,1) 2%, rgba(92,187,255,1) 63%);">
@@ -197,8 +247,6 @@
 
         </div>
     </div>
-
-
     <!-- Manager Home Page -->
     <div data-role="page" id="MNGhome" data-theme="a" class=" "
     style="background: rgb(156,63,255); background: linear-gradient(0deg, rgba(156,63,255,1) 2%, rgba(92,187,255,1) 63%);">
@@ -220,7 +268,7 @@
                 </div>
 
                 <div style="margin-top: 30px;">
-                    <a href="#stock" data-transition="slide">
+                    <a href="#viewproduct" data-transition="slide">
                         <div class="card">
                             <img src="imgs/viewproduct.png" alt="" class="d-flex home-logo center-h ">
                             <p class="title home-title center-h">View Product</p>
@@ -238,7 +286,6 @@
             </div>
         </div>
     </div>
-
     <!-- View Sales -->
     <div data-role="page" id="viewsales" data-theme="a" class=""
     style="background: rgb(156,63,255); background: linear-gradient(0deg, rgba(156,63,255,1) 2%, rgba(92,187,255,1) 63%);">
@@ -287,44 +334,25 @@
             </a>
         </div>
     </div>
+    <!-- view product -->
+    <div data-role="page" id="viewproduct" data-theme="a" class=" "
+    style="background: rgb(156,63,255); background: linear-gradient(0deg, rgba(156,63,255,1) 2%, rgba(92,187,255,1) 63%);">
+        <div data-role="main" class="ui-content">
+            <!-- Header -->
+            <div class="header d-flex card">
+                <div class="center-v fit-content">
+                    <img src="imgs/back.png" alt="backButton" id="backButton" style="width: 25px;"> 
+                </div>
+                <p class="title center-h">Products</p>
+            </div>
 
-</body>
+            <div class="" style="padding: 10px;">
+                <a href="#newproduct" class="ui-btn ui-btn-corner-all" data-transition="slide">New Product</a>
+                <ul  id="stocks" data-role="listview" data-filter="true" data-filter-placeholder="Search sales..." data-inset="true">
+                    
+                </ul>
+            </div>
+
+        </div>
+    </div>
 </html>
-<script>
-    $(document).ready(function() {
-    // Get the input element
-    const inputElement = $(".form-control.form");
-
-    // Increment button click event
-    $("#Add").on("click", function() {
-      // Get the current value
-      let currentValue = parseInt(inputElement.val());
-      // Increment the value
-      currentValue = Math.min(1000, currentValue + 1);
-      // Update the input field value
-      inputElement.val(currentValue);
-    });
-
-    // Decrement button click event
-    $("#minus").on("click", function() {
-      // Get the current value
-      let currentValue = parseInt(inputElement.val());
-      // Decrement the value, but not below 0
-      currentValue = Math.max(0, currentValue - 1);
-      // Update the input field value
-      inputElement.val(currentValue);
-    });
-  });
-</script>
-
-
-
-Table: Store
-Attributes:
-store_id    number
-store_name  varchar2(255)
-store_location  varchar2(255)
-store_username  varchar2(255)
-store_password  varchar2(255)
-manager_id  number
-
