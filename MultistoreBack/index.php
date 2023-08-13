@@ -2,6 +2,7 @@
     header('Access-Control-Allow-Origin: *');
     header('Access-Control-Allow-Methods: GET, POST');
     header("Access-Control-Allow-Headers: X-Requested-With");
+    
     DEFINE ('DB_USER', 'root');
     DEFINE ('DB_PASSWORD', '');
     DEFINE ('DB_HOST', 'localhost');
